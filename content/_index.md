@@ -4,141 +4,76 @@ type: docs
 weight: 10
 ---
 
-Matrix defines a set of open APIs for decentralised communication,
-suitable for securely publishing, persisting and subscribing to data
-over a global open federation of servers with no single point of
-control. Uses include Instant Messaging (IM), Voice over IP (VoIP)
-signalling, Internet of Things (IoT) communication, and bridging
-together existing communication silos - providing the basis of a new
-open real-time communication ecosystem.
+Matrix定义了一组开放的API，用于去中心化通讯，适用于在没有单一控制点的全球开放服务器联邦上安全地发布、持久化和订阅数据。用途包括即时通讯(IM)、VoIP信令、物联网(IoT)通信以及桥接现有通信孤岛，为新的开放实时通信生态系统提供基础。
 
-To propose a change to the Matrix Spec, see the explanations at
-[Proposals for Spec Changes to Matrix](/proposals).
+如果想要对Matrix规范提出更改建议，请参阅[Matrix规范更改提案](/proposals)中的说明。
 
-## Matrix APIs
+## Matrix API
 
-The specification consists of the following parts:
+该规范包括以下部分：
 
-* [Client-Server API](/client-server-api)
-* [Server-Server API](/server-server-api)
-* [Application Service API](/application-service-api)
-* [Identity Service API](/identity-service-api)
-* [Push Gateway API](/push-gateway-api)
-* [Room Versions](/rooms)
-* [Appendices](/appendices)
+* [客户端-服务器API](/client-server-api)
+* [服务器-服务器API](/server-server-api)
+* [应用服务API](/application-service-api)
+* [身份服务API](/identity-service-api)
+* [推送网关API](/push-gateway-api)
+* [房间版本](/rooms)
+* [附录](/appendices)
 
-Additionally, this introduction page contains the key baseline
-information required to understand the specific APIs, including the
-section the [overall architecture](#architecture).
+此外，该介绍页面包含了理解特定API所需的关键基线信息，包括[整体架构](#architecture)部分。
 
-The [Matrix API Viewer](https://matrix.org/docs/api/) is useful for
-browsing the Client-Server API.
+[Matrix API查看器](https://matrix.org/docs/api/)可用于浏览客户端-服务器API。
 
-## Introduction to the Matrix APIs
+## Matrix API 简介
 
-Matrix is a set of open APIs for open-federated Instant Messaging (IM),
-Voice over IP (VoIP) and Internet of Things (IoT) communication,
-designed to create and support a new global real-time communication
-ecosystem. The intention is to provide an open decentralised pubsub
-layer for the internet for securely persisting and
-publishing/subscribing JSON objects. This specification is the ongoing
-result of standardising the APIs used by the various components of the
-Matrix ecosystem to communicate with one another.
+Matrix 是一组用于开放联邦即时消息 (IM)、语音 IP (VoIP) 和物联网 (IoT) 通信的开放 API，旨在创建和支持一个全新的全球实时通信生态系统。其目的是为互联网提供一个开放的分散式发布订阅层，用于安全地持久化和发布/订阅 JSON 对象。本规范是将 Matrix 生态系统各组件之间用于相互通信的 API 标准化的持续成果。
 
-The principles that Matrix attempts to follow are:
+Matrix 试图遵循的原则包括：
 
--   Pragmatic Web-friendly APIs (i.e. JSON over REST)
--   Keep It Simple & Stupid
-    -   provide a simple architecture with minimal third-party
-        dependencies.
--   Fully open:
-    -   Fully open federation - anyone should be able to participate in
-        the global Matrix network
-    -   Fully open standard - publicly documented standard with no IP or
-        patent licensing encumbrances
-    -   Fully open source reference implementation - liberally-licensed
-        example implementations with no IP or patent licensing
-        encumbrances
--   Empowering the end-user
-    -   The user should be able to choose the server and clients they
-        use
-    -   The user should be able to control how private their
-        communication is
-    -   The user should know precisely where their data is stored
--   Fully decentralised - no single points of control over conversations
-    or the network as a whole
--   Learning from history to avoid repeating it
-    -   Trying to take the best aspects of XMPP, SIP, IRC, SMTP, IMAP
-        and NNTP whilst trying to avoid their failings
+- 实用的面向 Web 的 API（即 JSON over REST）
+- 保持简单和愚蠢
+  - 提供一个简单的架构，第三方依赖最少。
+- 完全开放：
+  - 完全开放的联邦 - 任何人都应能参与全球 Matrix 网络
+  - 完全开放的标准 - 公开记录的标准，无知识产权或专利许可限制
+  - 完全开源的参考实现 - 自由许可的示例实现，无知识产权或专利许可限制
+- 赋予终端用户权力
+  - 用户应能选择他们使用的服务器和客户端
+  - 用户应能控制他们的通信隐私程度
+  - 用户应清楚地知道他们的数据存储在哪里
+- 完全去中心化 - 对话和整个网络都没有单一的控制点
+- 从历史中学习，避免重蹈覆辙
+  - 试图从 XMPP、SIP、IRC、SMTP、IMAP 和 NNTP 中吸取最佳实践，同时避免它们的失败之处
 
-The functionality that Matrix provides includes:
+Matrix 提供的功能包括：
 
--   Creation and management of fully distributed chat rooms with no
-    single points of control or failure
--   Eventually-consistent cryptographically secure synchronisation of
-    room state across a global open network of federated servers and
-    services
--   Sending and receiving extensible messages in a room with (optional)
-    end-to-end encryption
--   Extensible user management (inviting, joining, leaving, kicking,
-    banning) mediated by a power-level based user privilege system.
--   Extensible room state management (room naming, aliasing, topics,
-    bans)
--   Extensible user profile management (avatars, display names, etc)
--   Managing user accounts (registration, login, logout)
--   Use of 3rd Party IDs (3PIDs) such as email addresses, phone numbers,
-    Facebook accounts to authenticate, identify and discover users on
-    Matrix.
--   Trusted federation of identity servers for:
-    -   Publishing user public keys for PKI
-    -   Mapping of 3PIDs to Matrix IDs
+- 创建和管理完全分布式的聊天室，没有单一的控制点或故障点
+- 在全球开放的联邦服务器和服务网络上进行最终一致性的加密安全的房间状态同步
+- 在房间中发送和接收可扩展消息，带有（可选的）端到端加密
+- 通过基于权限级别的用户权限系统进行可扩展的用户管理（邀请、加入、离开、踢出、封禁）。
+- 可扩展的房间状态管理（房间命名、别名、主题、封禁）
+- 可扩展的用户个人资料管理（头像、显示名称等）
+- 管理用户帐户（注册、登录、注销）
+- 使用第三方 ID（3PID），如电子邮件地址、电话号码、Facebook 帐户进行认证、识别和发现 Matrix 上的用户。
+- 可信任的身份服务器联邦，用于：
+  - 发布用户公钥以进行 PKI
+  - 将 3PID 映射到 Matrix ID
 
-The end goal of Matrix is to be a ubiquitous messaging layer for
-synchronising arbitrary data between sets of people, devices and
-services - be that for instant messages, VoIP call setups, or any other
-objects that need to be reliably and persistently pushed from A to B in
-an interoperable and federated manner.
+Matrix 的最终目标是成为一个无处不在的消息层，用于在人群、设备和服务之间同步任意数据，无论是即时消息、VoIP 呼叫设置，还是其他需要以互操作和联邦方式可靠、持久地从 A 推送到 B 的对象。
 
-### Spec Change Proposals
+### 规范更改建议
 
-To propose a change to the Matrix Spec, see the explanations at
-[Proposals for Spec Changes to Matrix](/proposals).
+要提议更改 Matrix 规范，请参阅 [Matrix 规范更改建议](/proposals) 中的解释。
 
-## Architecture
+## 架构
 
-Matrix defines APIs for synchronising extensible JSON objects known as
-"events" between compatible clients, servers and services. Clients are
-typically messaging/VoIP applications or IoT devices/hubs and
-communicate by synchronising communication history with their
-"homeserver" using the "Client-Server API". Each homeserver stores the
-communication history and account information for all of its clients,
-and shares data with the wider Matrix ecosystem by synchronising
-communication history with other homeservers and their clients.
+Matrix 定义了用于在兼容的客户端、服务器和服务之间同步可扩展 JSON 对象（称为"事件"）的 API。客户端通常是消息/ VoIP 应用程序或 IoT 设备/集线器，并使用 "客户端-服务器 API" 与其 "家庭服务器" 同步通信历史记录。每个家庭服务器存储其所有客户端的通信历史记录和帐户信息，并通过与其他家庭服务器及其客户端同步通信历史记录与更广泛的 Matrix 生态系统共享数据。
 
-Clients typically communicate with each other by emitting events in the
-context of a virtual "room". Room data is replicated across *all of the
-homeservers* whose users are participating in a given room. As such, *no
-single homeserver has control or ownership over a given room*.
-Homeservers model communication history as a partially ordered graph of
-events known as the room's "event graph", which is synchronised with
-eventual consistency between the participating servers using the
-"Server-Server API". This process of synchronising shared conversation
-history between homeservers run by different parties is called
-"Federation". Matrix optimises for the Availability and Partitioned
-properties of CAP theorem at the expense of Consistency.
+客户端通常通过在虚拟 "房间" 的上下文中发出事件来相互通信。房间数据在参与给定房间的 *所有家庭服务器* 之间复制。因此，*没有单个家庭服务器对给定房间具有控制或所有权*。家庭服务器将通信历史记录建模为称为房间的 "事件图" 的部分排序事件图，该事件图使用 "服务器-服务器 API" 在参与服务器之间最终达成一致。将共享对话历史记录在由不同方运行的家庭服务器之间同步的过程称为 "联邦"。Matrix 优先考虑 CAP 定理的可用性和分区属性，而牺牲了一致性。
 
-For example, for client A to send a message to client B, client A
-performs an HTTP PUT of the required JSON event on its homeserver (HS)
-using the client-server API. A's HS appends this event to its copy of
-the room's event graph, signing the message in the context of the graph
-for integrity. A's HS then replicates the message to B's HS by
-performing an HTTP PUT using the server-server API. B's HS authenticates
-the request, validates the event's signature, authorises the event's
-contents and then adds it to its copy of the room's event graph. Client
-B then receives the message from his homeserver via a long-lived GET
-request.
+例如，要让客户端 A 向客户端 B 发送消息，客户端 A 使用客户端-服务器 API 在其家庭服务器 (HS) 上执行所需 JSON 事件的 HTTP PUT。A 的 HS 将此事件添加到其房间事件图的副本中，在图的上下文中对消息进行签名以确保完整性。A 的 HS 然后使用服务器-服务器 API 对 B 的 HS 执行 HTTP PUT 以复制消息。B 的 HS 对请求进行身份验证，验证事件的签名，对事件内容授权，然后将其添加到房间事件图的副本中。客户端 B 然后通过长时间存活的 GET 请求从他的家庭服务器接收消息。
 
-How data flows between clients:
+数据在客户端之间的流动方式：
 
 ```
     { Matrix client A }                             { Matrix client B }
@@ -154,114 +89,57 @@ How data flows between clients:
                               (Federation)
 ```
 
-### Users
+### 用户
 
-Each client is associated with a user account, which is identified in
-Matrix using a unique "user ID". This ID is namespaced to the homeserver
-which allocated the account and has the form:
+每个客户端都与一个用户帐户关联，该帐户在 Matrix 中使用唯一的 "用户 ID" 进行标识。此 ID 位于分配帐户的家庭服务器的命名空间中，并具有以下形式：
 
     @localpart:domain
 
-See ['Identifier Grammar' in the
-appendices](/appendices#identifier-grammar) for full details of the
-structure of user IDs.
+有关用户ID结构的完整详细信息，请参阅[附录中的"标识符语法"](https://matrix.org/docs/spec/appendices#identifier-grammar)。
 
-### Devices
+### 设备
 
-The Matrix specification has a particular meaning for the term "device".
-As a user, I might have several devices: a desktop client, some web
-browsers, an Android device, an iPhone, etc. They broadly relate to a
-real device in the physical world, but you might have several browsers
-on a physical device, or several Matrix client applications on a mobile
-device, each of which would be its own device.
+Matrix 规范对 "设备" 这个术语有特定的含义。作为用户，我可能有多个设备：桌面客户端，一些网络浏览器，Android 设备，iPhone 等。它们大致与现实世界中的真实设备相关，但您可能在一个物理设备上有多个浏览器，或在一个移动设备上有多个 Matrix 客户端应用程序，每个应用程序都将是自己的设备。
 
-Devices are used primarily to manage the keys used for end-to-end
-encryption (each device gets its own copy of the decryption keys), but
-they also help users manage their access - for instance, by revoking
-access to particular devices.
+设备主要用于管理端到端加密所使用的密钥（每个设备都有自己的解密密钥副本），但它们还可以帮助用户管理他们的访问权限，例如通过撤销对特定设备的访问权限。
 
-When a user first uses a client, it registers itself as a new device.
-The longevity of devices might depend on the type of client. A web
-client will probably drop all of its state on logout, and create a new
-device every time you log in, to ensure that cryptography keys are not
-leaked to a new user. In a mobile client, it might be acceptable to
-reuse the device if a login session expires, provided the user is the
-same.
+当用户首次使用客户端时，它会将自己注册为新设备。设备的寿命可能取决于客户端的类型。Web 客户端可能在注销时丢弃所有状态，并在每次登录时创建新设备，以确保加密密钥不泄露给新用户。在移动客户端中，如果登录会话过期，可以在用户相同的情况下重用设备。
 
-Devices are identified by a `device_id`, which is unique within the
-scope of a given user.
+设备由 `device_id` 标识，该设备在给定用户的范围内是唯一的。
 
-A user may assign a human-readable display name to a device, to help
-them manage their devices.
+用户可以为设备分配一个易于阅读的显示名称，以帮助他们管理设备。
 
-### Events
+### 事件
 
-All data exchanged over Matrix is expressed as an "event". Typically
-each client action (e.g. sending a message) correlates with exactly one
-event. Each event has a `type` which is used to differentiate different
-kinds of data. `type` values MUST be uniquely globally namespaced
-following Java's [package naming
-conventions](https://en.wikipedia.org/wiki/Java_package#Package_naming_conventions),
-e.g. `com.example.myapp.event`. The special top-level namespace `m.` is
-reserved for events defined in the Matrix specification - for instance
-`m.room.message` is the event type for instant messages. Events are
-usually sent in the context of a "Room".
+通过 Matrix 交换的所有数据都表示为 "事件"。通常，每个客户端操作（例如发送消息）与恰好一个事件相关联。每个事件都有一个 `type`，用于区分不同类型的数据。`type` 值必须遵循 Java 的[包命名约定](https://en.wikipedia.org/wiki/Java_package#Package_naming_conventions)进行全局唯一命名空间划分，例如 `com.example.myapp.event`。特殊的顶级命名空间 `m.` 保留给 Matrix 规范中定义的事件 - 例如，`m.room.message` 是即时消息的事件类型。事件通常在 "房间" 的上下文中发送。
 
 {{% boxes/warning %}}
-Event bodies are considered untrusted data. This means that any application using
-Matrix must validate that the event body is of the expected shape/schema
-before using the contents verbatim.
+事件正文被视为不可信数据。这意味着使用 Matrix 的任何应用程序都必须在逐字使用内容之前验证事件正文是否具有预期的形状/模式。
 
-**It is not safe to assume that an event body will have all the expected
-fields of the expected types.**
+**假设事件正文具有所有预期类型的预期字段是不安全的。**
 
-See [MSC2801](https://github.com/matrix-org/matrix-spec-proposals/blob/main/proposals/2801-untrusted-event-data.md) for more
-detail on why this assumption is unsafe.
+请参阅 [MSC2801](https://github.com/matrix-org/matrix-spec-proposals/blob/main/proposals/2801-untrusted-event-data.md) 以获取有关为什么这个假设不安全的更多详细信息。
 {{% /boxes/warning %}}
 
-### Event Graphs
+### 事件图
 
-Events exchanged in the context of a room are stored in a directed
-acyclic graph (DAG) called an "event graph". The partial ordering of
-this graph gives the chronological ordering of events within the room.
-Each event in the graph has a list of zero or more "parent" events,
-which refer to any preceding events which have no chronological
-successor from the perspective of the homeserver which created the
-event.
+在房间上下文中交换的事件存储在一个有向无环图（DAG）中，称为 "事件图"。此图的部分排序给出了房间内事件的时间顺序。图中的每个事件都有零个或多个 "父" 事件的列表，这些事件指的是从创建事件的家庭服务器的角度来看没有时间顺序后继的任何先前事件。
 
-Typically an event has a single parent: the most recent message in the
-room at the point it was sent. However, homeservers may legitimately
-race with each other when sending messages, resulting in a single event
-having multiple successors. The next event added to the graph thus will
-have multiple parents. Every event graph has a single root event with no
-parent.
+通常，一个事件有一个父事件：在发送时房间里最近的消息。然而，家庭服务器在发送消息时可能合法地与彼此竞争，导致单个事件具有多个后继者。接下来添加到图中的事件将具有多个父事件。每个事件图都有一个没有父事件的单一根事件。
 
-To order and ease chronological comparison between the events within the
-graph, homeservers maintain a `depth` metadata field on each event. An
-event's `depth` is a positive integer that is strictly greater than the
-depths of any of its parents. The root event should have a depth of 1.
-Thus if one event is before another, then it must have a strictly
-smaller depth.
+为了对图中的事件进行排序并方便在时间顺序上进行比较，家庭服务器在每个事件上维护一个 `depth` 元数据字段。事件的 `depth` 是一个正整数，严格大于其任何父事件的深度。根事件应具有深度 1。因此，如果一个事件在另一个事件之前，则其深度必须严格较小。
 
-### Room structure
+### 房间结构
 
-A room is a conceptual place where users can send and receive events.
-Events are sent to a room, and all participants in that room with
-sufficient access will receive the event. Rooms are uniquely identified
-internally via "Room IDs", which have the form:
+房间是一个概念上的地方，用户可以在其中发送和接收事件。事件被发送到房间，拥有足够访问权限的该房间内的所有参与者都将接收到事件。房间通过 "房间 ID" 在内部唯一标识，其形式为：
 
     !opaque_id:domain
 
-There is exactly one room ID for each room. Whilst the room ID does
-contain a domain, it is simply for globally namespacing room IDs. The
-room does NOT reside on the domain specified.
+每个房间只有一个房间 ID。虽然房间 ID 包含一个域，但它仅用于全球命名空间房间 ID。房间并不位于指定的域上。
 
-See ['Identifier Grammar' in the
-appendices](/appendices#identifier-grammar) for full details of the
-structure of a room ID.
+有关房间 ID 结构的完整详细信息，请参阅[附录中的"标识符语法"](https://matrix.org/docs/spec/appendices#identifier-grammar)。
 
-The following conceptual diagram shows an `m.room.message` event being
-sent to the room `!qporfwt:matrix.org`:
+以下概念性示意图显示了一个 `m.room.message` 事件被发送到房间 `!qporfwt:matrix.org`：
 
     { @alice:matrix.org }                             { @bob:example.org }
             |                                                 ^
@@ -285,7 +163,7 @@ sent to the room `!qporfwt:matrix.org`:
                       PKI signature from matrix.org
                       Transaction-layer metadata
                       PKI Authorization header
-
+    
                   ....................................
                  |           Shared Data              |
                  | State:                             |
@@ -299,61 +177,31 @@ sent to the room `!qporfwt:matrix.org`:
                  |     Content: { JSON object }       |
                  |....................................|
 
-Federation maintains *shared data structures* per-room between multiple
-homeservers. The data is split into `message events` and `state events`.
+联邦在多个家庭服务器之间为每个房间维护*共享数据结构*。数据分为`消息事件`和`状态事件`。
 
-Message events:
-These describe transient 'one-off' activity in a room such as
-instant messages, VoIP call setups, file transfers, etc. They generally
-describe communication activity.
+消息事件：
+这些描述了房间中瞬态的一次性活动，例如即时消息、VoIP 呼叫设置、文件传输等。它们通常描述通信活动。
 
-State events:
-These describe updates to a given piece of persistent information
-('state') related to a room, such as the room's name, topic, membership,
-participating servers, etc. State is modelled as a lookup table of
-key/value pairs per room, with each key being a tuple of `state_key` and
-`event type`. Each state event updates the value of a given key.
+状态事件：
+这些描述与房间相关的某个持久信息（'状态'）的更新，如房间的名称、主题、成员资格、参与服务器等。状态被建模为每个房间的键/值对查找表，每个键都是 `state_key` 和 `event type` 的元组。每个状态事件更新给定键的值。
 
-The state of the room at a given point is calculated by considering all
-events preceding and including a given event in the graph. Where events
-describe the same state, a merge conflict algorithm is applied. The
-state resolution algorithm is transitive and does not depend on server
-state, as it must consistently select the same event irrespective of the
-server or the order the events were received in. Events are signed by
-the originating server (the signature includes the parent relations,
-type, depth and payload hash) and are pushed over federation to the
-participating servers in a room, currently using full mesh topology.
-Servers may also request backfill of events over federation from the
-other servers participating in a room.
+房间在给定点的状态是通过考虑图中包括给定事件在内的所有先前事件来计算的。对于描述相同状态的事件，将应用合并冲突算法。状态解析算法是传递的，不依赖于服务器状态，因为它必须始终选择相同的事件，而不考虑服务器或事件接收的顺序。事件由发起服务器签名（签名包括父关系、类型、深度和有效载荷哈希），并通过联邦推送到房间中的参与服务器，目前使用完全网状拓扑。服务器还可以从参与房间的其他服务器那里请求联邦回填事件。
 
 {{% boxes/note %}}
-Events are not limited to the types defined in this specification. New
-or custom event types can be created on a whim using the Java package
-naming convention. For example, a `com.example.game.score` event can be
-sent by clients and other clients would receive it through Matrix,
-assuming the client has access to the `com.example` namespace.
+事件不仅限于本规范中定义的类型。可以根据需要使用 Java 包命名约定创建新的或自定义事件类型。例如，客户端可以发送一个 `com.example.game.score` 事件，其他客户端将通过 Matrix 接收到它，假设客户端有权访问 `com.example` 命名空间。
 {{% /boxes/note %}}
 
-#### Room Aliases
+#### 房间别名
 
-Each room can also have multiple "Room Aliases", which look like:
+每个房间还可以有多个 "房间别名"，它们看起来像这样：
 
     #room_alias:domain
 
-See ['Identifier Grammar' in the
-appendices](/appendices#identifier-grammar) for full details of the
-structure of a room alias.
+有关房间别名结构的完整细节，请参阅 附录中的 "标识符语法"。
 
-A room alias "points" to a room ID and is the human-readable label by
-which rooms are publicised and discovered. The room ID the alias is
-pointing to can be obtained by visiting the domain specified. Note that
-the mapping from a room alias to a room ID is not fixed, and may change
-over time to point to a different room ID. For this reason, Clients
-SHOULD resolve the room alias to a room ID once and then use that ID on
-subsequent requests.
+房间别名 "指向" 一个房间 ID，并作为宣传和发现房间的人类可读标签。可以通过访问指定的域来获取别名所指向的房间 ID。请注意，从房间别名到房间 ID 的映射不是固定的，可能会随着时间的推移指向不同的房间 ID。因此，客户端应该将房间别名解析为一个房间 ID，然后在后续请求中使用该 ID。
 
-When resolving a room alias the server will also respond with a list of
-servers that are in the room that can be used to join via.
+在解析房间别名时，服务器还会响应一个可以通过加入的房间中的服务器列表。
 
     HTTP GET
     #matrix:example.org      !aaabaa:matrix.org
@@ -367,127 +215,66 @@ servers that are in the room that can be used to join via.
     | #bike   >> !4rguxf:matrix.org  |
     |________________________________|
 
-### Identity
+### 身份
 
-Users in Matrix are identified via their Matrix user ID. However,
-existing 3rd party ID namespaces can also be used in order to identify
-Matrix users. A Matrix "Identity" describes both the user ID and any
-other existing IDs from third-party namespaces *linked* to their
-account. Matrix users can *link* third-party IDs (3PIDs) such as email
-addresses, social network accounts and phone numbers to their user ID.
-Linking 3PIDs creates a mapping from a 3PID to a user ID. This mapping
-can then be used by Matrix users in order to discover the user IDs of
-their contacts. In order to ensure that the mapping from 3PID to user ID
-is genuine, a globally federated cluster of trusted "identity servers"
-(IS) are used to verify the 3PID and persist and replicate the mappings.
+Matrix 中的用户通过他们的 Matrix 用户 ID 来识别。然而，现有的第三方 ID 命名空间也可以用来识别 Matrix 用户。Matrix "Identity" 描述了用户 ID 和与他们的帐户*关联*的来自第三方命名空间的任何其他现有 ID。Matrix 用户可以将第三方 ID（3PID）（如电子邮件地址、社交网络帐户和电话号码）*链接*到他们的用户 ID。链接 3PID 创造了一个从 3PID 到用户 ID 的映射。然后，Matrix 用户可以使用此映射来发现他们联系人的用户 ID。为了确保从 3PID 到用户 ID 的映射是真实的，使用全球联合的受信任的 "identity server"（IS）集群来验证 3PID 并持久化和复制映射。
 
-Usage of an IS is not required in order for a client application to be
-part of the Matrix ecosystem. However, without one clients will not be
-able to look up user IDs using 3PIDs.
+在客户端应用程序成为 Matrix 生态系统的一部分时，不需要使用 IS。然而，如果没有一个客户端，将无法使用 3PID 查找用户 ID。
 
-### Profiles
+### 个人资料
 
-Users may publish arbitrary key/value data associated with their account
-- such as a human-readable display name, a profile photo URL, contact
-information (email address, phone numbers, website URLs etc).
+用户可以发布与他们的帐户关联的任意键/值数据
 
-### Private User Data
+- 例如可读的显示名称、个人资料照片 URL、联系信息（电子邮件地址、电话号码、网站 URL 等）。
 
-Users may also store arbitrary private key/value data in their account -
-such as client preferences, or server configuration settings which lack
-any other dedicated API. The API is symmetrical to managing Profile
-data.
+### 私人用户数据
 
-## Common concepts
+用户还可以在他们的帐户中存储任意私有键/值数据 - 例如客户端首选项，或缺乏其他专用 API 的服务器配置设置。API 与管理个人资料数据相对称。
 
-Various things are common throughout all of the Matrix APIs. They are
-documented here.
+## 常见概念
 
-### Namespacing
+在所有 Matrix API 中，有许多共同之处。在此进行记录。
 
-Namespacing helps prevent conflicts between multiple applications and
-the specification itself. Where namespacing is used, `m.` prefixes are
-used by the specification to indicate that the field is controlled by
-the specification. Custom or non-specified namespaces used in the wild
-MUST use the Java package naming convention to prevent conflicts.
+### 命名空间
 
-As an example, event types defined in the specification are namespaced
-under the special `m.` prefix, however any client can send a custom
-event type, such as `com.example.game.score` (assuming the client has
-rights to the `com.example` namespace) without needing to put the event
-into the `m.` namespace.
+命名空间有助于防止多个应用程序和规范本身之间的冲突。在使用命名空间的地方，规范使用 `m.` 前缀来表示该字段受规范控制。野生中使用的自定义或未指定的命名空间必须使用 Java 包命名约定以防止冲突。
 
-### Timestamps
+例如，在规范中定义的事件类型在特殊的 `m.` 前缀下命名空间，但任何客户端都可以发送自定义事件类型，例如 `com.example.game.score`（假设客户端有权使用 `com.example` 命名空间），而无需将事件放入 `m.` 命名空间。
 
-Unless otherwise stated, timestamps are measured as milliseconds since
-the Unix epoch. Throughout the specification this may be referred to as
-POSIX, Unix, or just "time in milliseconds".
+### 时间戳
 
-## Specification Versions
+除非另有说明，时间戳以 Unix 纪元以来的毫秒为单位测量。在整个规范中，这可能被称为 POSIX、Unix 或仅仅是 "毫秒时间"。
 
-Matrix as a whole is released under a single specification number in the
-form `vX.Y`.
+## 规范版本
 
-* A change to `X` reflects a breaking or substantially invasive change.
-  When exactly to increment this number is left to the Spec Core Team,
-  however it is intended for changes such as moving away from JSON,
-  altering the signing algorithm, or when a large number of `Y` changes
-  feel deserving of a major version increase.
-* A change to `Y` represents a backwards compatible or "managed" backwards
-  compatible change to the specification, usually in the form of features.
+Matrix 作为一个整体发布在一个单一的规范数字下，形式为 `vX.Y`。
 
-Additionally, the spec version may have arbitrary metadata applied to it
-when followed by a `-`. For example, `v1.1-alpha`. Usage of this is not
-strictly specified but is intended for usage of pre-release builds of the
-specification.
+* 更改 `X` 表示破坏性或大幅侵入性变更。何时递增此数字由规范核心团队决定，但它用于诸如从 JSON 迁移、更改签名算法或大量 `Y` 变更值得主版本增加时的更改。
+* 更改 `Y` 表示规范的向后兼容或"管理"向后兼容更改，通常以功能形式出现。
 
-Note that while `v1.2` is meant to be backwards compatible with `v1.1`, it
-is not guaranteed that future versions will be fully backwards compatible
-with `v1.1`. For example, if `/test` were to be introduced in `v1.1` and
-deprecated in `v1.2`, then it can be removed in `v1.3`. More information
-about this is described in the [deprecation policy](#deprecation-policy)
-below.
+此外，规范版本可能在跟随 `-` 时附加任意元数据，例如 `v1.1-alpha`。使用这个并没有严格规定，但用于规范的预发布版本。
 
-### Endpoint versioning
+请注意，虽然 `v1.2` 旨在与 `v1.1` 向后兼容，但不能保证未来版本将完全向后兼容 `v1.1`。例如，如果在 `v1.1` 中引入 `/test` 并在 `v1.2` 中弃用，那么可以在 `v1.3` 中删除它。关于这方面的更多信息，请参阅下面的[弃用策略](#deprecation-policy)。
 
-All API endpoints within the specification are versioned individually.
-This means that `/v3/sync` (for example) can get deprecated in favour
-of `/v4/sync` without affecting `/v3/profile` at all. A server supporting
-`/v4/sync` would keep serving `/v3/profile` as it always has.
+### 端点版本控制
 
-When an MSC proposes a breaking change to an endpoint it should also
-deprecate the existing endpoint. For some endpoints this might be implicit,
-such as `/v4/sync` being introduced (deprecating `/v3/sync`), however
-for more nuanced examples the MSC should deprecate the endpoint explicitly.
+规范中的所有 API 端点都单独进行版本控制。这意味着 `/v3/sync`（例如）可以被弃用，转而使用 `/v4/sync`，而不会影响到 `/v3/profile`。支持 `/v4/sync` 的服务器将继续提供 `/v3/profile` 服务，就像以前一样。
 
-### Deprecation policy
+当 MSC 提议对端点进行破坏性更改时，也应该弃用现有端点。对于某些端点，这可能是隐含的，例如引入 `/v4/sync`（弃用 `/v3/sync`），然而对于更细微的示例，MSC 应该明确弃用端点。
 
-An MSC is required to transition something from stable (the default) to
-deprecated. Once something has been deprecated for suitably long enough
-(usually 1 version), it is eligible for removal from the specification
-with another MSC.
+### 废弃策略
 
-Implementations of Matrix are required to implement deprecated functionality
-of the specification, though when the functionality is later removed then
-the implementation is welcome to drop support (if they don't advertise
-support for a version which includes deprecated functionality). For
-example, if `/test` were deprecated in `v1.2` and removed in `v1.3`, then
-an implementation which wants to advertise support for `v1.2` would have
-to implement `/test`, even if the implementation also advertises support
-for `v1.3`. If that implementation *only* advertises support for `v1.3`
-then it would not be required to implement `/test`.
+需要一个 MSC 将某个东西从稳定（默认）转变为已弃用。一旦某物被弃用足够长时间（通常为 1 个版本），它就有资格通过另一个 MSC 从规范中删除。
 
-### Legacy versioning
+Matrix 的实现需要实现规范的已弃用功能，尽管当功能稍后删除时，实现可以随意放弃支持（如果它们不宣传支持包括已弃用功能的版本）。例如，如果 `/test` 在 `v1.2` 中被弃用并在 `v1.3` 中删除，那么一个希望宣传支持 `v1.2` 的实现将不得不实现 `/test`，即使该实现还宣传支持 `v1.3`。如果实现*仅*宣传支持 `v1.3`，那么它将不需要实现 `/test`。
 
-Prior to this system, the different APIs of Matrix were versioned individually.
-This is no longer possible with the new specification versioning approach.
+### 旧版版本控制
 
-For historical reference, the APIs were versioned as `rX.Y.Z` where `X`
-roughly represents a breaking change, `Y` a backwards-compatible change, and
-`Z` a patch or insignificant alteration to the API.
+在此系统之前，Matrix 的不同 API 是单独进行版本控制的。使用新的规范版本控制方法，这不再可能。
 
-`v1.0` of Matrix was released on June 10th, 2019 with the following API
-versions:
+作为历史参考，API 版本控制为 `rX.Y.Z`，其中 `X` 大致表示破坏性更改，`Y` 表示向后兼容性更改，而 `Z` 是对 API 的修补或不重要的改动。
+
+2019 年 6 月 10 日发布的 Matrix `v1.0` 具有以下 API 版本：
 
 | API/Specification       | Version |
 |-------------------------|---------|
